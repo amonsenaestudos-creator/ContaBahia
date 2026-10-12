@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --ink: #0D2B52;
+  --navy: #0D2B52;
+  --cyan: #40B8E8;
+  --cyan-light: #6DCFF6;
+  --blue: #1F7CC0;
+  --sky: #D5EDFB;
+  --paper: #ffffff;
+  --mist: #F4F8FC;
+  --line: #DCE9F3;
+  --muted: #5A7190;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
+  main { overflow-x: clip; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--cyan); color: white; }
+  a { color: inherit; text-decoration: none; }
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  button, [role="tab"] { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #6DCFF6; outline-offset: 4px; }
+}
+
+@layer components {
+  .container-shell { width: min(100% - 3rem, 1184px); margin-inline: auto; }
+  .section-space { padding-block: clamp(4.75rem, 7.6vw, 7.25rem); }
+  .eyebrow { display: inline-flex; align-items: center; gap: .6rem; color: var(--cyan); font-size: .65rem; font-weight: 800; letter-spacing: .15em; line-height: 1.4; text-transform: uppercase; }
+  .eyebrow::before { content: ""; width: 20px; height: 2px; background: currentColor; }
+  .eyebrow--light { color: var(--cyan-light); }
+  .display-heading { color: var(--ink); font-size: clamp(2.05rem, 3.8vw, 3.3rem); font-weight: 650; letter-spacing: -.055em; line-height: 1.13; }
+  .brand-input { width: 100%; margin-top: .55rem; border: 1px solid var(--line); border-radius: 11px; background: #F7F9FC; padding: .85rem 1rem; color: var(--ink); font-size: 13px; font-weight: 500; transition: border-color .2s, box-shadow .2s, background .2s; }
+  .brand-input::placeholder { color: #8396a8; font-weight: 400; }
+  .brand-input:focus { border-color: var(--cyan); background: white; outline: none; box-shadow: 0 0 0 4px rgba(64, 184, 232, 0.12); }
+}
+
+@media (max-width: 640px) {
+  .container-shell { width: calc(100% - 2rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .motion-reveal { opacity: 1 !important; transform: none !important; }
+}

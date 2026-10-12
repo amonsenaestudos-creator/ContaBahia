@@ -3,6 +3,7 @@ import { BadgeCheck, MapPin, UserRound } from "lucide-react";
 import { BrandMark } from "@/components/Brand";
 import { Reveal } from "@/components/motion/Reveal";
 import SlideTextButton from "@/components/kokonutui/slide-text-button";
+import { withBasePath } from "@/lib/paths";
 import { accountantName } from "@/lib/site";
 
 const principles = [
@@ -16,7 +17,7 @@ export function About() {
     <section id="sobre" className="section-space overflow-hidden bg-white">
       <div className="container-shell grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-20">
         <Reveal direction="left" className="relative pb-9">
-          <div className="relative aspect-[1.06/1] overflow-hidden rounded-[24px] rounded-bl-[80px] bg-[#e1eaf3]"><Image src="/images/rotina-contabil.jpg" alt="Análise de documentos e cálculo contábil; fotografia ilustrativa" fill sizes="(max-width: 1024px) 90vw, 43vw" className="object-cover object-center" /><div className="absolute inset-0 bg-gradient-to-t from-[var(--navy)]/35 to-transparent" /><div className="absolute left-5 top-5 rounded-full border border-white/80 bg-white/90 px-3.5 py-2 text-[9px] font-bold uppercase tracking-[.1em] text-[#31587f]">Cuidado em cada detalhe</div></div>
+          <div className="relative aspect-[1.06/1] overflow-hidden rounded-[24px] rounded-bl-[80px] bg-[#e1eaf3]"><Image src={withBasePath("/images/rotina-contabil.jpg")} alt="Análise de documentos e cálculo contábil; fotografia ilustrativa" fill sizes="(max-width: 1024px) 90vw, 43vw" className="object-cover object-center" /><div className="absolute inset-0 bg-gradient-to-t from-[var(--navy)]/35 to-transparent" /><div className="absolute left-5 top-5 rounded-full border border-white/80 bg-white/90 px-3.5 py-2 text-[9px] font-bold uppercase tracking-[.1em] text-[#31587f]">Cuidado em cada detalhe</div></div>
           <div className="absolute bottom-0 right-0 flex items-center gap-4 rounded-[18px] border border-[#e1eaf3] bg-white p-5 shadow-[0_15px_40px_rgba(16,45,80,.1)] sm:-right-5"><BrandMark className="size-11" /><div><span className="flex items-center gap-1 text-[10px] font-bold text-[var(--cyan)]"><MapPin size={11} />Dias d’Ávila · Bahia</span><p className="mt-1.5 text-[13px] font-semibold tracking-[-.025em] text-[var(--ink)]">Atendimento com responsável definido.</p></div></div>
         </Reveal>
         <Reveal direction="right" delay={.1}>

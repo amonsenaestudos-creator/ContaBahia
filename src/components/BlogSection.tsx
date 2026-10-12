@@ -6,6 +6,7 @@ import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/r
 import { ArrowRight, ArrowUpRight, CalendarDays } from "lucide-react";
 import { HorizonMotif } from "@/components/Brand";
 import { Reveal } from "@/components/motion/Reveal";
+import { withBasePath } from "@/lib/paths";
 
 type ArticlePreview = { id: string; title: string; slug: string; excerpt: string; category: string; publishedAt: string; coverImage: string | null };
 const covers = ["bg-[var(--navy)] text-white", "bg-[#e6effb] text-[#194a82]", "bg-[var(--cyan)] text-white"];
@@ -39,7 +40,7 @@ export function BlogSection({ articles, allArticles = false }: { articles: Artic
                   <motion.article data-blog-card key={article.id} layout initial={reduce ? false : { opacity: 0, y: 24, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: .95 }} whileHover={reduce ? {} : { y: -5 }} transition={{ layout: { type: "spring", stiffness: 240, damping: 26 }, opacity: { duration: .2 }, y: { duration: .35 }, scale: { duration: .2 } }} className="group overflow-hidden rounded-[19px] border border-[#e0e9f3] bg-white">
                     <Link href={`/blog/${article.slug}`} aria-label={`Ler ${article.title}`} className="flex h-full flex-col">
                       <div className={`relative flex h-[185px] flex-col justify-between overflow-hidden p-6 ${covers[index % covers.length]}`}>
-                        {article.coverImage ? <div role="img" aria-label={article.title} className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105" style={{ backgroundImage: `linear-gradient(0deg,rgba(11,36,67,.45),rgba(11,36,67,.2)),url("${article.coverImage.replaceAll('"', "%22")}")` }} /> : <HorizonMotif className="absolute -bottom-32 -right-28 size-[410px] text-current opacity-20 transition duration-700 group-hover:rotate-6" />}
+                        {article.coverImage ? <div role="img" aria-label={article.title} className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105" style={{ backgroundImage: `linear-gradient(0deg,rgba(11,36,67,.45),rgba(11,36,67,.2)),url("${withBasePath(article.coverImage).replaceAll('"', "%22")}")` }} /> : <HorizonMotif className="absolute -bottom-32 -right-28 size-[410px] text-current opacity-20 transition duration-700 group-hover:rotate-6" />}
                         <p className="relative text-[9px] font-semibold uppercase tracking-[.17em] opacity-70">conta bahia / ideias que orientam</p>
                         <div className="relative flex items-end justify-between gap-6"><p className="max-w-[220px] text-[23px] font-semibold leading-tight tracking-[-.045em]">{article.category}</p><ArrowUpRight size={22} strokeWidth={1.5} className="shrink-0 opacity-65" /></div>
                       </div>

@@ -1,0 +1,38 @@
+# Dependências
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Next.js (build e exportação estática para o GitHub Pages)
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# Testes e artefatos de verificação
+coverage/
+artifacts/
+playwright-report/
+test-results/
+
+# Variáveis de ambiente (mantenha apenas o exemplo no repositório)
+.env
+.env.*
+!.env.example
+
+# Logs e sistema
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Deploys de terceiros
+.vercel

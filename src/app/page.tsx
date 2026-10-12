@@ -13,8 +13,6 @@ import { Testimonials } from "@/components/Testimonials";
 import { ValueProps } from "@/components/ValueProps";
 import { getArticles } from "@/lib/articles";
 
-export const dynamic = "force-dynamic";
-
 export default async function HomePage() {
   const articles = await getArticles(12);
 

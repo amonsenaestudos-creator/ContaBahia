@@ -4,14 +4,17 @@ import { chromium } from "@playwright/test";
 import dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
-const baseURL = process.env.PREVIEW_URL || "http://localhost:3000";
+// Site estático: rode `npm run build && npm run preview` antes. Para testar com o prefixo do
+// GitHub Pages, use PREVIEW_URL=http://localhost:3000/ContaBahia (com o build feito com o mesmo prefixo).
+const baseURL = (process.env.PREVIEW_URL || "http://localhost:3000").replace(/\/+$/, "");
+const homeURL = `${baseURL}/`;
+const hasRemoteSupabase = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 const browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
 const page = await context.newPage();
 const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 await mkdir("artifacts", { recursive: true });
-let submittedEmail = "";
 
 const scrollTo = async (selector) => {
   await page.locator(selector).evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
@@ -20,7 +23,7 @@ const scrollTo = async (selector) => {
 const canvasImage = () => page.locator("canvas[data-kokonut='beams-background']").evaluate((canvas) => canvas.toDataURL());
 
 try {
-  const response = await page.goto(baseURL, { waitUntil: "networkidle" });
+  const response = await page.goto(homeURL, { waitUntil: "networkidle" });
   assert.equal(response.status(), 200);
   await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
   await page.waitForTimeout(1200);
@@ -85,28 +88,28 @@ try {
   await page.getByRole("button", { name: "Ver região no mapa" }).click();
   await page.locator("#contact-map iframe").waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Fechar mapa" }).click();
-  const invalid = await context.request.post(`${baseURL}/api/leads`, { data: {} });
-  assert.equal(invalid.status(), 400);
+  const form = page.getByRole("form", { name: "Formulário de contato" });
+  await form.locator("[name=name]").fill("Verificação automatizada da interface");
+  await form.locator("[name=email]").fill("interface@example.invalid");
+  await form.locator("[name=phone]").fill("telefone");
+  await form.locator("[name=companyType]").selectOption("Já tenho empresa");
+  await form.locator("[name=message]").fill("Teste funcional da validação do formulário. Não entrar em contato.");
+  await form.getByRole("button", { name: "Enviar solicitação" }).click();
+  await form.getByRole("alert").getByText("Informe um telefone ou WhatsApp válido.").waitFor({ state: "visible" });
 
-  const hasRemoteSupabase = Boolean(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL);
   if (!hasRemoteSupabase) {
-    submittedEmail = `interface-${Date.now()}@example.invalid`;
-    const form = page.getByRole("form", { name: "Formulário de contato" });
-    await form.locator("[name=name]").fill("Verificação automatizada da interface");
-    await form.locator("[name=email]").fill(submittedEmail);
+    // Sem Supabase, o formulário abre o e-mail do visitante com a mensagem pronta (nada é gravado).
     await form.locator("[name=phone]").fill("71900000000");
-    await form.locator("[name=companyType]").selectOption("Já tenho empresa");
-    await form.locator("[name=message]").fill("Registro temporário de teste funcional. Não entrar em contato. Será excluído após o teste.");
-    const submitResponse = page.waitForResponse((res) => res.url().endsWith("/api/leads") && res.request().method() === "POST");
     await form.getByRole("button", { name: "Enviar solicitação" }).click();
-    const result = await submitResponse;
-    assert.equal(result.status(), 201, await result.text());
-    await page.getByRole("heading", { name: "Mensagem recebida." }).waitFor({ state: "visible" });
-    await page.getByRole("button", { name: "Enviar outra mensagem" }).click();
+    await page.getByRole("heading", { name: "Falta só enviar o e-mail." }).waitFor({ state: "visible" });
+    const mailto = await page.locator("[data-lead-mailto]").getAttribute("href");
+    assert.ok(mailto?.startsWith("mailto:"), "Fallback should prepare a mailto: link");
+    assert.ok(mailto.includes(encodeURIComponent("interface@example.invalid")), "mailto: body should include the visitor e-mail");
+    await page.getByRole("button", { name: "Voltar ao formulário" }).click();
     await page.getByRole("form", { name: "Formulário de contato" }).waitFor({ state: "visible" });
   }
 
-  for (const route of ["/blog", "/privacidade", "/blog/quem-tem-direito-ao-pronampe"]) {
+  for (const route of ["/blog/", "/privacidade/", "/blog/quem-tem-direito-ao-pronampe/"]) {
     const routeResponse = await page.goto(`${baseURL}${route}`, { waitUntil: "networkidle" });
     assert.equal(routeResponse.status(), 200, route);
   }
@@ -114,7 +117,7 @@ try {
   const mobile = await context.newPage();
   await mobile.setViewportSize({ width: 390, height: 844 });
   mobile.on("pageerror", (error) => errors.push(error.message));
-  await mobile.goto(baseURL, { waitUntil: "networkidle" });
+  await mobile.goto(homeURL, { waitUntil: "networkidle" });
   await mobile.waitForTimeout(1400);
   await mobile.getByRole("button", { name: "Pausar animações do destaque" }).click();
   await mobile.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
@@ -129,23 +132,14 @@ try {
 
   const reduced = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
   const reducedPage = await reduced.newPage();
-  await reducedPage.goto(baseURL, { waitUntil: "networkidle" });
+  await reducedPage.goto(homeURL, { waitUntil: "networkidle" });
   const staticText = await reducedPage.locator("[data-kokonut='type-writer']").textContent();
   await reducedPage.waitForTimeout(650);
   assert.equal(await reducedPage.locator("[data-kokonut='type-writer']").textContent(), staticText, "Reduced motion should have stable text");
   await reduced.close();
 
   assert.deepEqual(errors, [], "No browser runtime errors");
-  console.log("PASS: Beams, Typewriter, Slide Text Button, pause, service details, keyboard tabs, app preview, blog filters, map, lead validation, internal pages, mobile navigation and reduced motion.");
+  console.log("PASS: Beams, Typewriter, Slide Text Button, pause, service details, keyboard tabs, app preview, blog filters, map, lead validation and e-mail fallback, internal pages, mobile navigation and reduced motion.");
 } finally {
-  if (submittedEmail) {
-    const { db, pool } = await import("../src/db/index.ts");
-    const { leads } = await import("../src/db/schema.ts");
-    const { eq } = await import("drizzle-orm");
-    const rows = await db.select({ id: leads.id }).from(leads).where(eq(leads.email, submittedEmail));
-    await db.delete(leads).where(eq(leads.email, submittedEmail));
-    await pool.end();
-    console.log(`Lead persistence verified: ${rows.length} record; test data removed.`);
-  }
   await browser.close();
 }

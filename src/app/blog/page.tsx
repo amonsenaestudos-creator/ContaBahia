@@ -6,7 +6,6 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { getArticles } from "@/lib/articles";
 
-export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Blog de contabilidade e gestão", description: "Artigos da Conta Bahia sobre MEI, impostos, gestão, departamento pessoal e prestação de contas." };
 
 export default async function BlogPage() {

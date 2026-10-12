@@ -30,8 +30,8 @@ create index if not exists articles_published_at_idx on public.articles (publish
 alter table public.leads enable row level security;
 alter table public.articles enable row level security;
 
--- O formulário usa a chave de serviço no servidor quando configurada.
--- Esta política também permite usar a chave anon em ambientes sem chave de serviço.
+-- O site é estático (GitHub Pages): o formulário grava direto do navegador com a chave pública
+-- (anon/publishable). Esta política só aceita inserções com dados válidos, e visitantes não podem ler os contatos.
 drop policy if exists "Public can submit valid leads" on public.leads;
 create policy "Public can submit valid leads"
   on public.leads for insert to anon, authenticated

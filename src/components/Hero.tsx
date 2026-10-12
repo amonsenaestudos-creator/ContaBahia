@@ -8,6 +8,7 @@ import BeamsBackground from "@/components/kokonutui/beams-background";
 import TypewriterTitle from "@/components/kokonutui/type-writer";
 import SlideTextButton from "@/components/kokonutui/slide-text-button";
 import { BrandMark, HorizonMotif } from "@/components/Brand";
+import { withBasePath } from "@/lib/paths";
 import { accountantName, contactPhone } from "@/lib/site";
 
 const phrases = [
@@ -70,7 +71,7 @@ export function Hero() {
         >
           <motion.div style={{ rotateY: motionPaused ? 0 : rotateY, rotateX: motionPaused ? 0 : rotateX, transformPerspective: 1200 }} className="relative">
             <div className="relative aspect-[1.06/1] overflow-hidden rounded-[22px] rounded-tr-[82px] border border-white/15 bg-[#cfdce7] shadow-[0_28px_60px_rgba(0,0,0,.18)]">
-              <Image src="/images/atendimento-contabil.jpg" alt="Conversa de orientação contábil e revisão de documentos; fotografia ilustrativa" fill priority sizes="(max-width: 1024px) 90vw, 40vw" className="object-cover object-[54%_center]" />
+              <Image src={withBasePath("/images/atendimento-contabil.jpg")} alt="Conversa de orientação contábil e revisão de documentos; fotografia ilustrativa" fill priority sizes="(max-width: 1024px) 90vw, 40vw" className="object-cover object-[54%_center]" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#061e3c]/80 via-transparent to-transparent" />
               <div className="absolute bottom-7 left-6 right-6 flex items-end justify-between gap-4">
                 <div><p className="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d0e3f7]">Por trás de cada número</p><p className="mt-2 max-w-[245px] text-[19px] font-semibold leading-[1.35] tracking-[-.025em]">Uma conversa que entende o seu negócio.</p></div>

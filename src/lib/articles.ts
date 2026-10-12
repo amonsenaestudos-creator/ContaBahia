@@ -2,6 +2,12 @@ import "server-only";
 
 import { getSupabaseClient } from "@/lib/supabase";
 
+/*
+ * Os artigos são lidos durante o build (`next build`) e viram páginas HTML estáticas.
+ * Com o Supabase configurado, os artigos publicados lá aparecem no site a cada novo deploy;
+ * sem ele, o blog mostra os artigos demonstrativos abaixo.
+ */
+
 export type Article = {
   id: string;
   title: string;
@@ -74,6 +80,10 @@ const sampleArticles: Article[] = [
   },
 ];
 
+// Cada slug vira uma pasta do site exportado (/blog/<slug>/), então só aceitamos minúsculas, números e hífens.
+const SAFE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const ARTICLE_COLUMNS = "id,title,slug,excerpt,category,content,cover_image,published_at,created_at";
+
 function toArticle(row: Record<string, unknown>): Article {
   return {
     id: String(row.id ?? row.slug ?? "article"),
@@ -88,33 +98,41 @@ function toArticle(row: Record<string, unknown>): Article {
 }
 
 export async function getArticles(limit = 6): Promise<Article[]> {
-  const supabase = getSupabaseClient();
+  const supabase = await getSupabaseClient();
   if (!supabase) return sampleArticles.slice(0, limit);
 
   try {
     const { data, error } = await supabase
       .from("articles")
-      .select("id,title,slug,excerpt,category,content,cover_image,published_at,created_at")
+      .select(ARTICLE_COLUMNS)
       .not("published_at", "is", null)
       .lte("published_at", new Date().toISOString())
       .order("published_at", { ascending: false })
       .limit(limit);
 
-    if (error || !data?.length) return sampleArticles.slice(0, limit);
-    return (data as unknown as Record<string, unknown>[]).map(toArticle);
-  } catch {
+    if (error) console.warn("Supabase: não foi possível ler os artigos; usando artigos demonstrativos.", error.message);
+    const articles = (data as unknown as Record<string, unknown>[] | null)?.map(toArticle).filter((article) => SAFE_SLUG.test(article.slug)) ?? [];
+    return articles.length ? articles : sampleArticles.slice(0, limit);
+  } catch (error) {
+    console.warn("Supabase indisponível; usando artigos demonstrativos.", error);
     return sampleArticles.slice(0, limit);
   }
 }
 
-export async function getArticleBySlug(slug: string): Promise<Article | null> {
-  const supabase = getSupabaseClient();
+/** Slugs de todas as páginas de artigo geradas no build. */
+export async function getArticleSlugs(): Promise<string[]> {
+  const articles = await getArticles(1000);
+  return articles.map((article) => article.slug);
+}
 
-  if (supabase) {
+export async function getArticleBySlug(slug: string): Promise<Article | null> {
+  const supabase = await getSupabaseClient();
+
+  if (supabase && SAFE_SLUG.test(slug)) {
     try {
       const { data, error } = await supabase
         .from("articles")
-        .select("id,title,slug,excerpt,category,content,cover_image,published_at,created_at")
+        .select(ARTICLE_COLUMNS)
         .eq("slug", slug)
         .not("published_at", "is", null)
         .lte("published_at", new Date().toISOString())

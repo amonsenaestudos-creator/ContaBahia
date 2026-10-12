@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Building2, ImagePlus, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import { clients, clientSectors } from "@/lib/commercial";
+import { withBasePath } from "@/lib/paths";
 import { Reveal } from "@/components/motion/Reveal";
 
 export function Clients() {
@@ -17,7 +18,7 @@ export function Clients() {
 
         {clients.length > 0 ? (
           <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {clients.map((client, index) => <motion.article key={client.name} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: .4, delay: index * .05 }} className="flex min-h-[140px] flex-col items-center justify-center gap-2.5 rounded-[15px] border border-[#e4edf5] bg-[#f8fbfd] px-4 py-6 text-center">{client.logo ? <Image src={client.logo} alt={client.name} width={120} height={36} className="h-9 max-w-full object-contain" /> : <span className="grid size-11 place-items-center rounded-full bg-white text-[var(--cyan)]"><Building2 size={18} /></span>}<p className="text-[11px] font-bold leading-tight text-[var(--ink)]">{client.name}</p><p className="text-[9px] uppercase tracking-[.09em] text-[#8ba1b6]">{client.sector}</p></motion.article>)}
+            {clients.map((client, index) => <motion.article key={client.name} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: .4, delay: index * .05 }} className="flex min-h-[140px] flex-col items-center justify-center gap-2.5 rounded-[15px] border border-[#e4edf5] bg-[#f8fbfd] px-4 py-6 text-center">{client.logo ? <Image src={withBasePath(client.logo)} alt={client.name} width={120} height={36} className="h-9 max-w-full object-contain" /> : <span className="grid size-11 place-items-center rounded-full bg-white text-[var(--cyan)]"><Building2 size={18} /></span>}<p className="text-[11px] font-bold leading-tight text-[var(--ink)]">{client.name}</p><p className="text-[9px] uppercase tracking-[.09em] text-[#8ba1b6]">{client.sector}</p></motion.article>)}
           </div>
         ) : (
           <Reveal className="mt-10 rounded-[20px] border border-dashed border-[#c8ddec] bg-[#f4f9fd] p-6 sm:p-8">

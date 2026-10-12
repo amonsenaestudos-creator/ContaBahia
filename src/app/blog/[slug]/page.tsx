@@ -5,10 +5,17 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { whatsappLink } from "@/lib/site";
-import { getArticleBySlug } from "@/lib/articles";
+import { getArticleBySlug, getArticleSlugs } from "@/lib/articles";
 
 type ArticlePageProps = { params: Promise<{ slug: string }> };
-export const dynamic = "force-dynamic";
+
+// Site estático: cada artigo vira uma página HTML gerada no build. Slugs desconhecidos mostram a página 404.
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  const slugs = await getArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
